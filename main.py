@@ -287,13 +287,13 @@ y_test_n = to_categorical(y_test, 3)
 
 # Build the LSTM model
 model = Sequential()
-model = model.add(Embedding(input_dim=len(tokenizer.word_index) + 1, output_dim=100, input_length=maxlen))
-model = model.add(LSTM(100))
-model = model.add(Dense(128, activation='relu'))
-model = model.add(Dense(units=num_classes, activation='sigmoid'))
+model.add(Embedding(input_dim=len(tokenizer.word_index) + 1, output_dim=100, input_length=maxlen))
+model.add(LSTM(100))
+model.add(Dense(128, activation='relu'))
+model.add(Dense(units=num_classes, activation='sigmoid'))
 
 # Compile the model
-model = model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 #def getData(url):
 #    response = urllib.request.urlopen(url)
@@ -310,7 +310,14 @@ model = model.compile(loss='categorical_crossentropy', optimizer='adam', metrics
 #    loaded_model_json = json_file.read()
 #    lstm_model = model_from_json(loaded_model_json)
 
-lstm_model = model.load_model("lstm (2).json")
+#lstm_model = json.load_model("lstm (2).json")
+
+# JSON file
+f = open ("lstm (2).json", "r")
+ 
+# Reading from file
+lstm_model = json.loads(f.read())
+
 # Tokenizer setup
 tokenizer = Tokenizer()
 
