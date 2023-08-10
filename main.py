@@ -48,6 +48,8 @@ import contractions
 import string
 from collections import defaultdict, Counter
 from string import punctuation
+import urllib.request
+import json
 from nltk import pos_tag
 from nltk.tokenize import RegexpTokenizer, word_tokenize, TweetTokenizer
 from nltk.corpus import stopwords, wordnet
@@ -293,8 +295,18 @@ model.add(Dense(units=num_classes, activation='sigmoid'))
 # Compile the model
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
+def getData(url):
+    response = urllib.request.urlopen(url)
+    if(response.getcode()==200):
+        data = response.read()
+        jsonData = json.loads(data)
+    else:
+        print("Error occured", response.getcode())
+    return jsonData
 model_url = "https://raw.githubusercontent.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/main/lstm%20(2).json?token=GHSAT0AAAAAACCUMITQKGQKSBPBAVOD7IV6ZGUPRQA"
-with open(model_url, "r") as json_file:
+model_json = getData(model_url)
+
+with open(model_json, "r") as json_file:
     loaded_model_json = json_file.read()
     lstm_model = model_from_json(loaded_model_json)
 
