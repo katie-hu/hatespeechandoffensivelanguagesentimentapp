@@ -243,7 +243,7 @@ st.caption("Uses a Logistic Regression model trained on tweets. Check out the co
 
 #st.text_input("Enter your Name: ", key="name")
 #df1 = pd.read_csv('/Users/katiehu/Documents/GitHub/hatespeechsentimentapp/Prepared_Data.csv')
-url = "https://github.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/raw/main/Prepared_Data.csv"
+url = "https://raw.githubusercontent.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/main/Prepared_Data.csv"
 df1 = pd.read_csv(url, sep = ",", index_col=0)
 
 # Load Functions and Saved Best Model 
