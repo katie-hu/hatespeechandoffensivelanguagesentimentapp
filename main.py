@@ -241,7 +241,7 @@ def prepare(text, pipeline) :
 logo_url = "https://github.com/MendelinaL/Capstone/blob/main/Image/twitter_logo.png?raw=true"
 st.image(logo_url, width = 100)
 st.header("Hate Speech and Offensive Language Detection through Sentiment Analysis App")
-st.caption("Uses a Logistic Regression model trained on tweets. Check out the code [here](https://github.com/MendelinaL/Capstone)!")
+st.caption("Uses a Long Short-Term Memory (LSTM) model trained on tweets. Check out the code [here](https://github.com/MendelinaL/Capstone)!")
 
 #st.text_input("Enter your Name: ", key="name")
 #df1 = pd.read_csv('/Users/katiehu/Documents/GitHub/hatespeechsentimentapp/Prepared_Data.csv')
