@@ -56,10 +56,6 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from sklearn.model_selection import train_test_split
 
 
-# Suppress Warnings
-import warnings
-warnings.filterwarnings('ignore')
-
 # NLTK Downloads
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -240,9 +236,14 @@ def prepare(text, pipeline) :
 
 ##################
 
+logo_url = "https://github.com/MendelinaL/Capstone/blob/main/Image/twitter_logo.png?raw=true"
+st.image(logo_url, width = 100)
 st.header("Hate Speech and Offensive Language Detection through Sentiment Analysis App")
+st.caption("Uses a Logistic Regression model trained on tweets. Check out the code [here](https://github.com/MendelinaL/Capstone)!")
+
 #st.text_input("Enter your Name: ", key="name")
-url = "https://github.com/katie-hu/hatespeechsentimentapp/raw/main/Prepared_Data.csv"
+#df1 = pd.read_csv('/Users/katiehu/Documents/GitHub/hatespeechsentimentapp/Prepared_Data.csv')
+url = "https://github.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/raw/main/Prepared_Data.csv"
 df1 = pd.read_csv(url, sep = ",", index_col=0)
 
 # Load Functions and Saved Best Model 
@@ -256,15 +257,6 @@ y = label.apply(lambda x: sentiment_ordering.index(x))
 # Input column
 X = df1['clean_tweet']
 
-# Splitting of Data
-
-#X_train, X_test, y_train, y_test = train_test_split(df1['clean_tweet'], y, test_size = .15, stratify = y, random_state = 1025)
-
-# Use TfidfVectorizer to convert text to a matrix of TF-IDF features
-#vec = TfidfVectorizer(strip_accents = 'unicode', analyzer = 'word', ngram_range = (1,3))
-#vec.fit(X_train)
-#X_train = vec.transform(X_train)
-#X_test = vec.transform(X_test)
 
 # Splitting of Data
 
@@ -301,7 +293,7 @@ model.add(Dense(units=num_classes, activation='sigmoid'))
 # Compile the model
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-with open("/Users/katiehu/Documents/GitHub/Capstone/Code Library/lstm (2).json", "r") as json_file:
+with open("https://raw.githubusercontent.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/main/lstm%20(2).json?token=GHSAT0AAAAAACCUMITQKGQKSBPBAVOD7IV6ZGUPRQA", "r") as json_file:
     loaded_model_json = json_file.read()
     lstm_model = model_from_json(loaded_model_json)
 
