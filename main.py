@@ -293,7 +293,8 @@ model.add(Dense(units=num_classes, activation='sigmoid'))
 # Compile the model
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-with open("https://raw.githubusercontent.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/main/lstm%20(2).json?token=GHSAT0AAAAAACCUMITQKGQKSBPBAVOD7IV6ZGUPRQA", "r") as json_file:
+model_url = "https://raw.githubusercontent.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/main/lstm%20(2).json?token=GHSAT0AAAAAACCUMITQKGQKSBPBAVOD7IV6ZGUPRQA"
+with open(model_url, "r") as json_file:
     loaded_model_json = json_file.read()
     lstm_model = model_from_json(loaded_model_json)
 
