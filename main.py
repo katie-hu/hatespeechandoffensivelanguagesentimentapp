@@ -7,20 +7,6 @@ import numpy as np
 from sklearn.preprocessing import  LabelEncoder
 from sklearn.model_selection import train_test_split
 
-
-# Neural Network Models
-import tensorflow as tf
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, LSTM, Dense
-import keras
-from keras.models import Sequential
-from keras.layers import Dense, LSTM, Bidirectional, Dropout
-from keras.callbacks import EarlyStopping
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import SparseCategoricalCrossentropy, CategoricalCrossentropy
 # Neural Network Models
 import tensorflow
 from tensorflow.keras.preprocessing.text import Tokenizer
@@ -48,15 +34,15 @@ import contractions
 import string
 from collections import defaultdict, Counter
 from string import punctuation
-import urllib.request
-import json
 from nltk import pos_tag
 from nltk.tokenize import RegexpTokenizer, word_tokenize, TweetTokenizer
 from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.model_selection import train_test_split
-
 
 # NLTK Downloads
 nltk.download('stopwords')
@@ -68,7 +54,6 @@ nltk.download('vader_lexicon')
 
 
 # Create Functions For Cleaning Tweets
-
 sw = stopwords.words("english")
 lemmatizer = WordNetLemmatizer()  
 # Create Function for Cleaning Tweet
@@ -261,7 +246,7 @@ X = df1['clean_tweet']
 
 # Splitting of Data
 
-X_train, X_test, y_train, y_test = train_test_split(df1['clean_tweet'], y, test_size = .15, stratify = y, random_state = 1025)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .15, stratify = y, random_state = 1025)
 
 # Tokenize preprocessing for LSTM model
 tokenizer = Tokenizer()
@@ -303,7 +288,7 @@ epochs = 10
 model.fit(X_train_n, y_train_n, batch_size=batch_size, epochs=epochs, validation_data=(X_test_n, y_test_n), callbacks=[early_stop], validation_split=0.15)
 
 predictions = model.predict(X_test_n)
-predictions
+
 
 # Save my Model
 
@@ -322,7 +307,7 @@ predictions
 
 #print("Model has been saved as a JSON file in your Google Drive.")
 
-model.save_weights('weights.h5')
+#model.save_weights('weights.h5')
 
 # JSON file
 f = open ("model.json", "r")
@@ -349,9 +334,9 @@ if st.button('Predict Sentiment'):
     input_sequence = pad_sequences(input_sequence, maxlen=120)
 
     # Make prediction using the LSTM model
-    prediction = lstm_model.predict(input_sequence)
+    prediction = model.predict(input_sequence)
     sentiment_class = int(prediction.argmax())
-
+    print('prediction', prediction, 'sentiment', sentiment_class)
     if sentiment_class == 2:
         st.write("Positive Sentiment - No Hate Speech and Offensive Language Detected")
     elif sentiment_class == 1:
