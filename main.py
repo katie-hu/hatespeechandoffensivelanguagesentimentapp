@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.preprocessing import  LabelEncoder
 from sklearn.model_selection import train_test_split
 
+
 # Neural Network Models
 import tensorflow
 from tensorflow.keras.preprocessing.text import Tokenizer
@@ -53,10 +54,21 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('omw-1.4')
 nltk.download('vader_lexicon')
 
+# !pip install streamlit
+# !pip install contractions
+
+logo_url = "https://github.com/MendelinaL/Capstone/blob/main/Image/twitter_logo.png?raw=true"
+st.image(logo_url, width = 100)
+st.header("Hate Speech and Offensive Language Detection through Sentiment Analysis App")
+st.caption("Uses a Long Short-Term Memory (LSTM) model trained on tweets. Check out the code [here](https://github.com/MendelinaL/Capstone)!")
+
+url = "https://raw.githubusercontent.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/main/Prepared_Data.csv"
+df1 = pd.read_csv(url, sep = ",", index_col=0)
 
 # Create Functions For Cleaning Tweets
+
 sw = stopwords.words("english")
-lemmatizer = WordNetLemmatizer()  
+lemmatizer = WordNetLemmatizer()
 # Create Function for Cleaning Tweet
 
 def data_preparation_pipeline(tweet):
@@ -124,7 +136,7 @@ def spellcheck(text):
     return corpus
 
 def reduce_lengthening(tweet):
-    ''' 
+    '''
     Reduces repeated characters that occurs more than twice in a word.
     Example:
         meeet > meet
@@ -137,7 +149,7 @@ def reduce_lengthening(tweet):
     return orig_map
 
 # Tokenize the given text
-def tokenize(text) :  
+def tokenize(text) :
     text = [file.lower().strip() for file in text.split()]
     return(text)
 
@@ -154,7 +166,7 @@ def data_preparation_pipeline_func(text):
 
 # convert stringified list to list
 def strg_list_to_list(strg_list):
-  return strg_list.strip("[]").replace("'","").replace('"',"").replace(",","").split() 
+  return strg_list.strip("[]").replace("'","").replace('"',"").replace(",","").split()
 
 
 def nltk_pos_tagger(nltk_tag):
@@ -166,7 +178,7 @@ def nltk_pos_tagger(nltk_tag):
         return wordnet.NOUN
     elif nltk_tag.startswith('R'):
         return wordnet.ADV
-    else:          
+    else:
         return None
 
 #lemmatize requires list input
@@ -176,14 +188,14 @@ def lemmatize(unkn_input):
     if (isinstance(unkn_input,str)):
       list_input=strg_list_to_list(unkn_input)
     list_sentence = [item.lower() for item in list_input]
-    nltk_tagged = nltk.pos_tag(list_sentence)  
+    nltk_tagged = nltk.pos_tag(list_sentence)
     wordnet_tagged = map(lambda x: (x[0], nltk_pos_tagger(x[1])),nltk_tagged)
-    
+
     lemmatized_sentence = []
     for word, tag in wordnet_tagged:
         if tag is None:
             lemmatized_sentence.append(word)
-        else:        
+        else:
             lemmatized_sentence.append(lemmatizer.lemmatize(word, tag))
         #" ".join(lemmatized_sentence)
     return lemmatized_sentence
@@ -193,14 +205,14 @@ def preprocess(text):
     for token in text:
         if token not in sw:
             corpus.append(token)
-           
+
     tokenizer = RegexpTokenizer(r'\w+')
     tokens = tokenizer.tokenize(' '.join(corpus))
- 
+
     text = ' '.join(tokens)
     num_pattern = re.compile('[0-9]+')
     num_pattern.sub(r'', text)
-   
+
     return num_pattern.sub(r'', text)
 
 def preprocess1(text):
@@ -208,46 +220,33 @@ def preprocess1(text):
     for token in text:
         if token not in sw:
             corpus.append(token)
-           
+
     #tokenizer = RegexpTokenizer(r'\w+|\$[\d\.]+|\S')
     tokens = ' '.join(corpus)
- 
+
     text = ''.join(tokens)
     return text
 
 # Compile text into a pipeline
-def prepare(text, pipeline) : 
+def prepare(text, pipeline) :
     tokens = str(text)
-    for transform in pipeline : 
+    for transform in pipeline :
         tokens = transform(tokens)
     return(tokens)
 
-##################
-
-logo_url = "https://github.com/MendelinaL/Capstone/blob/main/Image/twitter_logo.png?raw=true"
-st.image(logo_url, width = 100)
-st.header("Hate Speech and Offensive Language Detection through Sentiment Analysis App")
-st.caption("Uses a Long Short-Term Memory (LSTM) model trained on tweets. Check out the code [here](https://github.com/MendelinaL/Capstone)!")
-
-#st.text_input("Enter your Name: ", key="name")
-#df1 = pd.read_csv('/Users/katiehu/Documents/GitHub/hatespeechsentimentapp/Prepared_Data.csv')
-url = "https://raw.githubusercontent.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/main/Prepared_Data.csv"
-df1 = pd.read_csv(url, sep = ",", index_col=0)
-
-# Load Functions and Saved Best Model 
+# Load Functions and Saved Best Model
 
 # Set the Label to be Numerical - The index of 'negative' is 0, 'neutral' is 1, and 'positive' is 2 in this list
 label = df1['sentiment']
 sentiment_ordering = ['negative', 'neutral', 'positive']
 y = label.apply(lambda x: sentiment_ordering.index(x))
-     
 
 # Input column
 X = df1['clean_tweet']
 
 # Splitting of Data
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .15, stratify = y, random_state = 1025)
+X_train, X_test, y_train, y_test = train_test_split(df1['clean_tweet'], y, test_size = .15, stratify = y, random_state = 1025)
 
 # Tokenize preprocessing for LSTM model
 tokenizer = Tokenizer()
@@ -289,35 +288,38 @@ epochs = 10
 model.fit(X_train_n, y_train_n, batch_size=batch_size, epochs=epochs, validation_data=(X_test_n, y_test_n), callbacks=[early_stop], validation_split=0.15)
 
 predictions = model.predict(X_test_n)
-
+predictions
 
 # Save my Model
 
 # Save the model in h5 format
-#model.save('content/drive/MyDrive/Colab Notebooks/model.h5')
+model.save('model.h5')
 
 # Convert the model to JSON format
-#model_json = model.to_json()
+model_json = model.to_json()
 
 # Specify the path where you want to save the JSON file
-#json_file_path = '/content/drive/MyDrive/Colab Notebooks/lstm.json'
+json_file_path = 'lstm.json'
 
 # Save the JSON data to the file
-#with open(json_file_path, 'w') as json_file:
-#    json_file.write(model_json)
+with open(json_file_path, 'w') as json_file:
+    json_file.write(model_json)
 
-#print("Model has been saved as a JSON file in your Google Drive.")
 
-#model.save_weights('weights.h5')
+model.save_weights('weights.h5')
 
-# JSON file
-f = open ("model.json", "r")
-# Reading from file
-lstm_model = json.loads(f.read())
+with open("model.json", "r") as json_file:
+    loaded_model_json = json_file.read()
+    lstm_model = model_from_json(loaded_model_json)
 
 lstm_model.load_weights("weights.h5")
 
 lstm_model.predict(X_test_n)
+
+# Tokenizer setup
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(X)
+X_n = tokenizer.texts_to_sequences(X)
 
 
 # Set Up Input Tweet
@@ -335,14 +337,12 @@ if st.button('Predict Sentiment'):
     input_sequence = pad_sequences(input_sequence, maxlen=120)
 
     # Make prediction using the LSTM model
-    prediction = model.predict(input_sequence)
+    prediction = lstm_model.predict(input_sequence)
     sentiment_class = int(prediction.argmax())
-    print('prediction', prediction, 'sentiment', sentiment_class)
+
     if sentiment_class == 2:
         st.write("Positive Sentiment - No Hate Speech and Offensive Language Detected")
     elif sentiment_class == 1:
         st.write("Neutral Sentiment - Hate Speech and Offensive Language Not Detected")
     elif sentiment_class == 0:
         st.write("Negative Sentiment - Hate Speech and Offensive Language Detected")
-
-
