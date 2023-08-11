@@ -259,7 +259,6 @@ y = label.apply(lambda x: sentiment_ordering.index(x))
 # Input column
 X = df1['clean_tweet']
 
-
 # Splitting of Data
 
 X_train, X_test, y_train, y_test = train_test_split(df1['clean_tweet'], y, test_size = .15, stratify = y, random_state = 1025)
@@ -276,6 +275,8 @@ X_n = pad_sequences(X_n, maxlen=maxlen)
 # num of classes
 num_classes = len(sentiment_ordering)
 
+# Split Data
+X_train_n, X_test_n, y_train, y_test = train_test_split(X_n, y, test_size = .15, stratify = y, random_state = 1025)
 
 # Add Early Stopping
 early_stop = EarlyStopping(monitor="val_loss",patience=5,verbose=True)
@@ -284,6 +285,7 @@ early_stop = EarlyStopping(monitor="val_loss",patience=5,verbose=True)
 y_train_n = to_categorical(y_train, 3)
 y_test_n = to_categorical(y_test, 3)
 
+# print(X_n)
 
 # Build the LSTM model
 model = Sequential()
@@ -295,31 +297,42 @@ model.add(Dense(units=num_classes, activation='sigmoid'))
 # Compile the model
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-#def getData(url):
-#    response = urllib.request.urlopen(url)
-#    if(response.getcode()==200):
-#        data = response.read()
-#        jsonData = json.loads(data)
-#    else:
-#        print("Error occured", response.getcode())
-#    return jsonData
-#model_url = "https://raw.githubusercontent.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/main/lstm%20(2).json?token=GHSAT0AAAAAACCUMITQKGQKSBPBAVOD7IV6ZGUPRQA"
-#model_json = getData(model_url)
+# Train the model
+batch_size = 32
+epochs = 10
+model.fit(X_train_n, y_train_n, batch_size=batch_size, epochs=epochs, validation_data=(X_test_n, y_test_n), callbacks=[early_stop], validation_split=0.15)
 
-#with open(model_json, "r") as json_file:
-#    loaded_model_json = json_file.read()
-#    lstm_model = model_from_json(loaded_model_json)
+predictions = model.predict(X_test_n)
+predictions
 
-#lstm_model = json.load_model("lstm (2).json")
+# Save my Model
+
+# Save the model in h5 format
+#model.save('content/drive/MyDrive/Colab Notebooks/model.h5')
+
+# Convert the model to JSON format
+#model_json = model.to_json()
+
+# Specify the path where you want to save the JSON file
+#json_file_path = '/content/drive/MyDrive/Colab Notebooks/lstm.json'
+
+# Save the JSON data to the file
+#with open(json_file_path, 'w') as json_file:
+#    json_file.write(model_json)
+
+#print("Model has been saved as a JSON file in your Google Drive.")
+
+model.save_weights('weights.h5')
 
 # JSON file
-f = open ("lstm (2).json", "r")
- 
+f = open ("model.json", "r")
 # Reading from file
 lstm_model = json.loads(f.read())
 
-# Tokenizer setup
-tokenizer = Tokenizer()
+lstm_model.load_weights("weights.h5")
+
+lstm_model.predict(X_test_n)
+
 
 # Set Up Input Tweet
 user_input = st.text_area("Enter Tweet Data")
