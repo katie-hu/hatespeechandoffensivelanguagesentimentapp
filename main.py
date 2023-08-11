@@ -64,7 +64,8 @@ st.caption("Uses a Long Short-Term Memory (LSTM) model trained on tweets. Check 
 
 url = "https://raw.githubusercontent.com/katie-hu/hatespeechandoffensivelanguagesentimentapp/main/Prepared_Data.csv"
 df1 = pd.read_csv(url, sep = ",", index_col=0)
-
+# Input column
+X = df1['clean_tweet']
 # Create Functions For Cleaning Tweets
 
 sw = stopwords.words("english")
@@ -195,7 +196,6 @@ with open("model.json", "r") as json_file:
 
 lstm_model.load_weights("weights.h5")
 
-lstm_model.predict(X_test_n)
 
 # Tokenizer setup
 tokenizer = Tokenizer()
