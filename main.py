@@ -122,41 +122,11 @@ def remove_stop(tokens) :
     tokens = [file for file in tokens if file not in sw]
     return(tokens)
 
-def spellcheck(text):
-    #text = word.split()
-    replaced_words = []
-    spell = SpellChecker()
-    #spell.word_frequency.load_text_file('load file')
-    #spell.word_frequency.load_words(['''add any words that might be corrected but it shouldn't be'''])
-    for token in text:
-        correct_word = spell.correction(token)
-        replaced_words.append(token)
-        print(correct_word, replaced_word)
-        corpus = " ".join(replaced_words)
-    return corpus
-
-def reduce_lengthening(tweet):
-    '''
-    Reduces repeated characters that occurs more than twice in a word.
-    Example:
-        meeet > meet
-    '''
-    pattern = re.compile(r"(.)\1(2,)")
-    orig_map = {}
-    for word in tweet:
-        reduced_word = pattern.sub(r"\1\1", word)
-        orig_map[word] - reduced_word
-    return orig_map
 
 # Tokenize the given text
 def tokenize(text) :
     text = [file.lower().strip() for file in text.split()]
     return(text)
-
-# Function to tokenize tweets using TweetTokenizer
-def tweet_tokenize(text):
-    tknzr = TweetTokenizer(reduce_len=True)
-    return tknzr.tokenize(text)
 
 def data_preparation_pipeline_func(text):
     text1 = [data_preparation_pipeline(word) for word in text]
@@ -167,7 +137,6 @@ def data_preparation_pipeline_func(text):
 # convert stringified list to list
 def strg_list_to_list(strg_list):
   return strg_list.strip("[]").replace("'","").replace('"',"").replace(",","").split()
-
 
 def nltk_pos_tagger(nltk_tag):
     if nltk_tag.startswith('J'):
@@ -206,21 +175,6 @@ def preprocess(text):
         if token not in sw:
             corpus.append(token)
 
-    tokenizer = RegexpTokenizer(r'\w+')
-    tokens = tokenizer.tokenize(' '.join(corpus))
-
-    text = ' '.join(tokens)
-    num_pattern = re.compile('[0-9]+')
-    num_pattern.sub(r'', text)
-
-    return num_pattern.sub(r'', text)
-
-def preprocess1(text):
-    corpus = []
-    for token in text:
-        if token not in sw:
-            corpus.append(token)
-
     #tokenizer = RegexpTokenizer(r'\w+|\$[\d\.]+|\S')
     tokens = ' '.join(corpus)
 
@@ -234,78 +188,6 @@ def prepare(text, pipeline) :
         tokens = transform(tokens)
     return(tokens)
 
-# Load Functions and Saved Best Model
-
-# Set the Label to be Numerical - The index of 'negative' is 0, 'neutral' is 1, and 'positive' is 2 in this list
-label = df1['sentiment']
-sentiment_ordering = ['negative', 'neutral', 'positive']
-y = label.apply(lambda x: sentiment_ordering.index(x))
-
-# Input column
-X = df1['clean_tweet']
-
-# Splitting of Data
-
-X_train, X_test, y_train, y_test = train_test_split(df1['clean_tweet'], y, test_size = .15, stratify = y, random_state = 1025)
-
-# Tokenize preprocessing for LSTM model
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(X)
-X_n = tokenizer.texts_to_sequences(X)
-
-# Pad the sequences for same length
-maxlen = 120
-X_n = pad_sequences(X_n, maxlen=maxlen)
-
-# num of classes
-num_classes = len(sentiment_ordering)
-
-# Split Data
-X_train_n, X_test_n, y_train, y_test = train_test_split(X_n, y, test_size = .15, stratify = y, random_state = 1025)
-
-# Add Early Stopping
-early_stop = EarlyStopping(monitor="val_loss",patience=5,verbose=True)
-
-# Convert the test target labels to one-hot encoded vectors
-y_train_n = to_categorical(y_train, 3)
-y_test_n = to_categorical(y_test, 3)
-
-# print(X_n)
-
-# Build the LSTM model
-model = Sequential()
-model.add(Embedding(input_dim=len(tokenizer.word_index) + 1, output_dim=100, input_length=maxlen))
-model.add(LSTM(100))
-model.add(Dense(128, activation='relu'))
-model.add(Dense(units=num_classes, activation='sigmoid'))
-
-# Compile the model
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-# Train the model
-batch_size = 32
-epochs = 10
-model.fit(X_train_n, y_train_n, batch_size=batch_size, epochs=epochs, validation_data=(X_test_n, y_test_n), callbacks=[early_stop], validation_split=0.15)
-
-predictions = model.predict(X_test_n)
-
-# Save my Model
-
-# Save the model in h5 format
-model.save('model.h5')
-
-# Convert the model to JSON format
-model_json = model.to_json()
-
-# Specify the path where you want to save the JSON file
-json_file_path = 'lstm.json'
-
-# Save the JSON data to the file
-with open(json_file_path, 'w') as json_file:
-    json_file.write(model_json)
-
-
-model.save_weights('weights.h5')
 
 with open("model.json", "r") as json_file:
     loaded_model_json = json_file.read()
@@ -329,7 +211,7 @@ my_pipeline = [tokenize, remove_stop, data_preparation_pipeline_func, lemmatize]
 # Make Prediction Function
 if st.button('Predict Sentiment'):
     # Prepare user input
-    user_input_cleaned = preprocess1(prepare(user_input, pipeline=my_pipeline))
+    user_input_cleaned = preprocess(prepare(user_input, pipeline=my_pipeline))
 
     # Tokenize and pad the input sequence
     input_sequence = tokenizer.texts_to_sequences([user_input_cleaned])
