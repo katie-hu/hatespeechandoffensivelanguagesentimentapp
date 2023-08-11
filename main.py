@@ -288,7 +288,6 @@ epochs = 10
 model.fit(X_train_n, y_train_n, batch_size=batch_size, epochs=epochs, validation_data=(X_test_n, y_test_n), callbacks=[early_stop], validation_split=0.15)
 
 predictions = model.predict(X_test_n)
-predictions
 
 # Save my Model
 
