@@ -57,7 +57,7 @@ nltk.download('vader_lexicon')
 # !pip install streamlit
 # !pip install contractions
 
-logo_url = "https://github.com/MendelinaL/Capstone/blob/main/Image/twitter_logo.png?raw=true"
+logo_url = "https://github.com/MendelinaL/Capstone/blob/main/Image/Miscellaneous/twitter_logo.png?raw=true"
 st.image(logo_url, width = 100)
 st.header("Hate Speech and Offensive Language Detection through Sentiment Analysis App")
 st.caption("Uses a Long Short-Term Memory (LSTM) model trained on tweets. Check out the code [here](https://github.com/MendelinaL/Capstone)!")
